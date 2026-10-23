@@ -1,7 +1,6 @@
-// Токен интеграции ИИ
-const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
-// Официальный рабочий адрес Google Gemini 2.5 Flash
-const GEMINI_API_URL = "https://googleapis.com" + GEMINI_API_KEY;
+// Авторизационный токен для работы с нейросетью Yandex GPT
+const YANDEX_API_KEY = "AQVN1_xWfvCN8gu9mCdz6XGFZbLT1kw_DEMO_KEY"; 
+const YANDEX_API_URL = "https://yandex.net";
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
 
@@ -19,30 +18,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcNormBtn = document.getElementById('calc-norm-btn');
     const bmrValueSpan = document.getElementById('bmr-value');
 
-    // Безотказная функция обращения к Google Gemini через fetch
-    async function askGoogleGemini(userInput) {
-        const systemPrompt = `Ты — профессиональный ИИ-нутрициолог. Твоя задача — строго анализировать входящий текст.
-        ПРАВИЛО МОДЕРАЦИИ: Если во входящем тексте написан бред (например, "аыаыаы"), случайный набор букв, нецензурная лексика или абсолютно несъедобные вещи, верни строго слово ERROR без каких-либо кавычек, скобок или знаков.
-        ПРАВИЛО РАСЧЕТА: Если текст является реальной едой или напитком, определи её среднюю Ккал, Белки, Жиры, Углеводы строго на 100 грамм (или 100 мл) продукта. 
-        Ответ выдай ИСКЛЮЧИТЕЛЬНО в формате чистого JSON-объекта, без markdown разметки и без обратных кавычек: {"kcal":число, "proteins":число, "fats":число, "carbs":число}`;
+    // Функция обращения к настоящему ИИ Yandex GPT
+    async function askYandexAI(userInput) {
+        const systemPrompt = `Ты — ИИ нутрициолог. ПРАВИЛО: Если пользователь ввел бред (аыаыаы) или мат, верни строго слово ERROR. Если введена еда, определи Ккал, Белки, Жиры, Углеводы строго на 100 грамм продукта. Ответ выведи ТОЛЬКО в формате чистого JSON: {"kcal":число, "proteins":число, "fats":число, "carbs":число}`;
 
-        const response = await fetch(GEMINI_API_URL, {
+        const response = await fetch(YANDEX_API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Authorization": "Api-Key " + YANDEX_API_KEY,
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: systemPrompt + "\n\nАнализируй запрос: " + userInput }] }]
+                modelUri: "gpt://b1g1xxxxxx/yandexgpt-lite", // Идентификатор модели
+                completionOptions: { stream: false, temperature: 0.1 },
+                messages: [
+                    { role: "system", text: systemPrompt },
+                    { role: "user", text: userInput }
+                ]
             })
         });
 
-        if (!response.ok) throw new Error("Сбой сервера");
+        if (!response.ok) throw new Error("Сбой сервера Yandex");
 
         const data = await response.json();
         
-        // Извлечение текста ответа из структуры данных Google API
-        const aiResponseText = data.candidates[0].content.parts[0].text.trim();
-        console.log("Ответ от Gemini:", aiResponseText);
-        
-        if (aiResponseText.includes("ERROR") || aiResponseText === "ERROR") {
+        // Стабильное извлечение текста ответа ИИ без риска опечаток в массивах
+        const aiResponseText = data.result.alternatives[0].message.text.trim();
+        console.log("Ответ от Yandex GPT:", aiResponseText);
+
+        if (aiResponseText.includes("ERROR")) {
             return "REJECTED";
         }
 
@@ -61,13 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             addBtn.disabled = true;
-            addBtn.textContent = "Gemini вычисляет...";
+            addBtn.textContent = "ИИ вычисляет...";
 
             try {
-                const result = await askGoogleGemini(aiInputText);
+                // Запуск настоящей нейросети
+                const result = await askYandexAI(aiInputText);
 
                 if (result === "REJECTED") {
-                    alert("ИИ заблокировал запрос (бред/маты)!");
+                    alert("ИИ заблокировал запрос (бред/маты/не еда)!");
                     return;
                 }
 
@@ -80,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 listItem.className = 'diary-item';
                 listItem.innerHTML = `
                     <div>
-                        <strong>[Gemini] ${aiInputText}</strong> — ${weight}г
+                        <strong>[Yandex GPT] ${aiInputText}</strong> — ${weight}г
                         <br><small style="color: #8d8d99">Б: ${calculatedProteins}г | Ж: ${calculatedFats}г | У: ${calculatedCarbs}г (на 100г: ${result.kcal} ккал)</small>
                     </div>
                     <span style="font-weight: bold; color: #00f5d4">+${calculatedKcal} ккал</span>
@@ -93,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
                 console.error(error);
-                alert("Ошибка ИИ. Проверьте запрос.");
+                alert("Произошла ошибка при связи с серверами ИИ.");
             } finally {
                 addBtn.disabled = false;
                 addBtn.textContent = "Проанализировать через Gemini";
