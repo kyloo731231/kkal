@@ -1,33 +1,282 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background-color: #121214; color: #e1e1e6; font-family: Arial, sans-serif; padding: 40px 20px; }
-.container { max-width: 1000px; margin: 0 auto; }
-.main-header { text-align: center; margin-bottom: 40px; }
-.main-header h1 { font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 36px; color: #ff2a7a; text-transform: uppercase; letter-spacing: -1px; }
-.main-header p { color: #8d8d99; margin-top: 10px; font-size: 16px; }
-.ai-status-badge { display: inline-block; margin-top: 15px; padding: 6px 16px; background-color: #29292e; border-radius: 20px; font-size: 12px; font-family: 'Unbounded', sans-serif; color: #00f5d4; border: 1px solid #00f5d4; }
-.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-@media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
-.left-column { display: flex; flex-direction: column; gap: 30px; }
-.calculator-box, .diary-box, .profile-box { background-color: #1d1d22; border: 1px solid #29292e; border-radius: 12px; padding: 30px; }
-h2 { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 20px; margin-bottom: 25px; color: #00f5d4; }
-.form-group { margin-bottom: 20px; flex: 1; }
-.form-row { display: flex; gap: 15px; }
-label { display: block; margin-bottom: 8px; color: #a8a8b3; font-size: 14px; }
-input { width: 100%; padding: 12px; background-color: #121214; border: 1px solid #29292e; border-radius: 6px; color: #fff; font-size: 16px; }
-input:focus { outline: none; border-color: #ff2a7a; }
-.gender-switch { display: flex; gap: 15px; padding-top: 10px; }
-.gender-switch label { display: flex; align-items: center; gap: 5px; cursor: pointer; color: #fff; }
-.btn { width: 100%; padding: 14px; background-color: #ff2a7a; color: #fff; border: none; border-radius: 6px; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-.btn:disabled { background-color: #3e3e44; color: #8d8d99; cursor: not-allowed; }
-.btn:hover:not(:disabled) { background-color: #e0206b; }
-.btn-secondary { background-color: #00f5d4; color: #121214; }
-.btn-secondary:hover { background-color: #00d4b8; }
-.norm-result { margin-top: 20px; padding: 15px; background-color: #121214; border-radius: 6px; border-left: 4px solid #00f5d4; font-family: 'Unbounded', sans-serif; font-size: 14px; color: #a8a8b3; }
-#bmr-value { color: #00f5d4; font-weight: 700; font-size: 18px; }
-.diary-list { list-style: none; margin-bottom: 25px; max-height: 250px; overflow-y: auto; }
-.diary-item { background-color: #121214; padding: 12px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #00f5d4; }
-.totals { border-top: 2px dashed #29292e; padding-top: 20px; }
-.totals h3 { font-size: 16px; margin-bottom: 15px; color: #a8a8b3; }
-.totals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
-.total-item { background-color: #121214; padding: 10px 5px; border-radius: 6px; font-size: 13px; color: #8d8d99; }
-.total-item span { display: block; font-size: 18px; font-weight: bold; color: #fff; margin-top: 5px; }
+/* 1. БАЗОВЫЕ И СБРОСОВЫЕ СТИЛИ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121214;
+    color: #e1e1e6;
+    font-family: Arial, sans-serif;
+    padding: 40px 20px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* 2. ШАПКА САЙТА */
+.main-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.main-header h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    color: #ff2a7a; /* Розовый неон */
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.main-header p {
+    color: #8d8d99;
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.ai-status-badge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 16px;
+    background-color: #29292e;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'Unbounded', sans-serif;
+    color: #00f5d4;
+    border: 1px solid #00f5d4;
+}
+
+/* 3. ДВУХКОЛОНОЧНАЯ СЕТКА (ДЛЯ ПК) */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 4. БЛОКИ-КОНТЕЙНЕРЫ */
+.calculator-box, .diary-box, .profile-box {
+    background-color: #1d1d22;
+    border: 1px solid #29292e;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+}
+
+h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 22px;
+    color: #00f5d4; /* Мятный неон */
+}
+
+/* 5. ЭЛЕМЕНТЫ ФОРМЫ (ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ) */
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Строка из нескольких полей (для ПК отображается в ряд) */
+.form-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #a8a8b3;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    background-color: #121214;
+    border: 1px solid #29292e;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff2a7a;
+}
+
+/* ИСПРАВЛЕННЫЙ ПЕРЕКЛЮЧАТЕЛЬ ПОЛА (Больше не ломается на смартфонах) */
+.gender-switch {
+    display: flex;
+    flex-direction: column; /* Элементы внутри блока теперь выстроены друг под другом */
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.gender-switch label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #fff;
+    margin-bottom: 0; /* Убираем конфликтные отступы */
+    font-size: 15px;
+}
+
+.gender-switch input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #ff2a7a; /* Перекрашиваем точку радио-кнопки в неоновый розовый */
+}
+
+/* 6. КНОПКИ */
+.btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #ff2a7a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-transform: uppercase;
+}
+
+.btn:disabled {
+    background-color: #3e3e44;
+    color: #8d8d99;
+    cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #e0206b;
+}
+
+.btn-secondary {
+    background-color: #00f5d4;
+    color: #121214;
+}
+
+.btn-secondary:hover {
+    background-color: #00d4b8;
+}
+
+/* 7. ИТОГИ И ДНЕВНИК */
+.norm-result {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #121214;
+    border-radius: 8px;
+    border-left: 4px solid #00f5d4;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    color: #a8a8b3;
+}
+
+#bmr-value {
+    color: #00f5d4;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.diary-list {
+    list-style: none;
+    margin-bottom: 25px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.diary-item {
+    background-color: #121214;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #00f5d4;
+}
+
+.totals {
+    border-top: 2px dashed #29292e;
+    padding-top: 20px;
+}
+
+.totals h3 {
+    font-size: 15px;
+    margin-bottom: 15px;
+    color: #a8a8b3;
+}
+
+.totals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+.total-item {
+    background-color: #121214;
+    padding: 12px 6px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #8d8d99;
+}
+
+.total-item span {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 6px;
+}
+
+/* ==========================================================================
+   8. АДАПТИВНАЯ ВЕРСТКА: МЕДИА-ЗАПРОСЫ (ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ)
+   ========================================================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 12px; /* Меньше отступы от краев экрана смартфона */
+    }
+
+    .main-header h1 {
+        font-size: 24px; /* Уменьшаем заголовок, чтобы он не переносился криво */
+    }
+
+    /* Превращаем двухколоночную сетку ПК в одну вертикальную колонку */
+    .main-grid {
+        grid-template-columns: 1fr; 
+        gap: 20px;
+    }
+
+    /* Все горизонтальные строки полей (Рост/Вес) перестраиваем в вертикальный стек */
+    .form-row {
+        flex-direction: column;
+        gap: 0; /* Убираем боковой зазор за ненадобностью */
+    }
+
+    .totals-grid {
+        grid-template-columns: repeat(2, 1fr); /* Итоги БЖУ на мобилке встанут компактно 2х2 */
+        gap: 8px;
+    }
+}
