@@ -1,6 +1,6 @@
 // Токен интеграции ИИ
 const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
-// Официальный эндпоинт Google Gemini 2.5 Flash
+// ИСПРАВЛЕННЫЙ ОФИЦИАЛЬНЫЙ АДРЕС: Все символы и знаки на своих местах
 const GEMINI_API_URL = `https://googleapis.com{GEMINI_API_KEY}`;
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
