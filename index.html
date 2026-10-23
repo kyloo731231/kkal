@@ -8,10 +8,6 @@
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- ПОДКЛЮЧАЕМ НАСТОЯЩИЙ ИИ: Стабильный CDN-скрипт Google Generative AI -->
-    <script src="https://jsdelivr.net"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -28,16 +24,14 @@
             <!-- Левая колонка: Расчет нормы и ИИ-Калькулятор -->
             <div class="left-column">
                 
-                <!-- Блок расчета суточной нормы (Полностью переделан в вертикальные строки) -->
+                <!-- Блок расчета суточной нормы -->
                 <section class="profile-box">
                     <h2>Твоя суточная норма</h2>
                     
-                    <!-- Строка 1: Метка пола -->
                     <div class="form-group">
                         <label>Пол пользователя:</label>
                     </div>
 
-                    <!-- Строка 2: Галочки выбора пола -->
                     <div class="form-group">
                         <div class="gender-switch">
                             <label><input type="radio" name="gender" value="male" checked> Мужской пол</label>
@@ -45,19 +39,16 @@
                         </div>
                     </div>
 
-                    <!-- Строка 3: Возраст -->
                     <div class="form-group">
                         <label for="user-age">Возраст (полных лет):</label>
                         <input type="number" id="user-age" value="22" min="1" max="120">
                     </div>
 
-                    <!-- Строка 4: Рост -->
                     <div class="form-group">
                         <label for="user-height">Рост (в сантиметрах):</label>
                         <input type="number" id="user-height" value="183" min="50" max="250">
                     </div>
 
-                    <!-- Строка 5: Вес -->
                     <div class="form-group">
                         <label for="user-weight">Вес (в килограммах):</label>
                         <input type="number" id="user-weight" value="106" min="10" max="300">
@@ -92,9 +83,7 @@
             <!-- Правая колонка: Дневник за сегодня -->
             <section class="diary-box">
                 <h2>Дневник питания за сегодня</h2>
-                <ul id="diary-list" class="diary-list">
-                    <!-- Сюда JS добавляет продукты -->
-                </ul>
+                <ul id="diary-list" class="diary-list"></ul>
 
                 <!-- Итоги дня -->
                 <div class="totals">
@@ -110,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Подключаем скрипт логики -->
     <script src="script.js"></script>
 </body>
 </html>
