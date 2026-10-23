@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await response.json();
         
-        // Исправлено: Добавлены корректные индексы массивов Google API [0]
+        // ТОЧНОЕ ИСПРАВЛЕНИЕ: Добавлены корректные индексы массивов для структуры Google API
         const aiResponseText = data.candidates[0].content.parts[0].text.trim();
         console.log("Ответ от Gemini:", aiResponseText);
 
@@ -116,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Критическая ошибка:", error);
                 alert("Произошла ошибка при связи с серверами Google Gemini AI.");
             } finally {
-                // Исправлено: Опечатка finaly заменена на корректное finally с двумя л
                 addBtn.disabled = false;
                 addBtn.textContent = "Проанализировать через Gemini";
             }
