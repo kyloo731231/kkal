@@ -266,3 +266,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             !Number.isFinite(age) || age < 1 || age > 120 ||
+            !Number.isFinite(height) || height < 50 || height > 250 ||
+!Number.isFinite(weight) || weight < 10 || weight > 300
+) {
+alert("Проверь возраст, рост и вес.");
+return null;
+}
+let bmr = 10 * weight + 6.25 * height - 5 * age;
+bmr += gender === "male" ? 5 : -161;
+const finalBmr = Math.round(bmr);
+const profile = { gender, age, height, weight, bmr: finalBmr };
+localStorage.setItem("userProfile", JSON.stringify(profile));
+return finalBmr;
+}
+function loadProfileFromStorage() {
+const saved = localStorage.getItem("userProfile");
+if (saved) {
+try {
+const profile = JSON.parse(saved);
+const maleRadio = document.querySelector('input[name="gender"][value="male"]');
+const femaleRadio = document.querySelector('input[name="gender"][value="female"]');
+if (profile.gender === "male" && maleRadio) maleRadio.checked = true;
+if (profile.gender === "female" && femaleRadio) femaleRadio.checked = true;
+if ($("user-age")) $("user-age").value = profile.age;
+if ($("user-height")) $("user-height").value = profile.height;
+if ($("user-weight")) $("user-weight").value = profile.weight;
+if (bmrValueSpan) bmrValueSpan.textContent = profile.bmr;
+if (normResult) normResult.style.display = "block";
+} catch (e) {
+console.error("Ошибка чтения профиля", e);
+}
+}
+}
+// ДОБАВЛЕНИЕ СЪЕДЕННОГО ЧЕРЕЗ ИИ
+addBtn.addEventListener("click", async () => {
+const product = productInput.value.trim();
+const weight = Number(weightInput.value);
+if (!product) {
+alert("Введи название продукта для ИИ.");
+productInput.focus();
+return;
+}
+if (!Number.isFinite(weight) || weight <= 0 || weight > 100000) {
+alert("Введи корректный вес или объём.");
+weightInput.focus();
+return;
+}
+addBtn.disabled = true;
+addBtn.textContent = "Gemini анализирует...";
+try {
+const result = await askGemini(product);
+addDiaryItem(product, weight, result);
+productInput.value = "";
+weightInput.value = "100";
+productInput.focus();
+} catch (error) {
+console.error("Ошибка анализа продукта:", error);
+alert(error.message || "Не удалось связаться с ИИ. Попробуй ещё раз.");
+} finally {
+addBtn.disabled = false;
+addBtn.textContent = "Проанализировать через Gemini";
+}
+});
+calcNormBtn?.addEventListener("click", () => {
+const bmr = calculateBMR();
+if (bmr !== null) {
+if (bmrValueSpan) bmrValueSpan.textContent = bmr;
+if (normResult) normResult.style.display = "block";
+}
+});
+});
