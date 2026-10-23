@@ -1,12 +1,9 @@
-// Токен интеграции ИИ
 const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
-// Официальный рабочий адрес Google Gemini 2.5 Flash
 const GEMINI_API_URL = "https://googleapis.com" + GEMINI_API_KEY;
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
-    
     const addBtn = document.getElementById('add-btn');
     const productWeightInput = document.getElementById('product-weight');
     const aiProductInput = document.getElementById('ai-product-input');
@@ -20,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcNormBtn = document.getElementById('calc-norm-btn');
     const bmrValueSpan = document.getElementById('bmr-value');
 
-    // Безотказная функция обращения к Google Gemini через fetch
     async function askGoogleGemini(userInput) {
         const systemPrompt = `Ты — профессиональный ИИ-нутрициолог. Твоя задача — строго анализировать входящий текст.
         ПРАВИЛО МОДЕРАЦИИ: Если во входящем тексте написан бред (например, "аыаыаы"), случайный набор букв, нецензурная лексика или абсолютно несъедобные вещи, верни строго слово ERROR без каких-либо кавычек, скобок или знаков.
@@ -29,26 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const response = await fetch(GEMINI_API_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: systemPrompt + "\n\nАнализируй запрос: " + userInput }]
-                }]
+                contents: [{ parts: [{ text: systemPrompt + "\n\nАнализируй запрос: " + userInput }] }]
             })
         });
 
-        if (!response.ok) {
-            throw new Error(`Ошибка сервера: ${response.status}`);
-        }
+        if (!response.ok) throw new Error("Сбой сервера");
 
         const data = await response.json();
         
-        // НАСТОЯЩЕЕ ИСПРАВЛЕНИЕ: Добавлены строгие индексы [0] для разбора структуры Google API
+        // Жесткий разбор ответа без риска синтаксических опечаток
         const aiResponseText = data.candidates[0].content.parts[0].text.trim();
-        console.log("Ответ от Gemini:", aiResponseText);
-
+        
         if (aiResponseText.includes("ERROR") || aiResponseText === "ERROR") {
             return "REJECTED";
         }
@@ -62,13 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const aiInputText = aiProductInput.value.trim();
             const weight = parseFloat(productWeightInput.value);
 
-            if (!weight || weight <= 0) {
-                alert("Введите корректный вес!");
-                return;
-            }
-
-            if (!aiInputText) {
-                alert("Напишите название продукта!");
+            if (!weight || weight <= 0 || !aiInputText) {
+                alert("Заполните поля корректно!");
                 return;
             }
 
@@ -79,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const result = await askGoogleGemini(aiInputText);
 
                 if (result === "REJECTED") {
-                    alert("ИИ-Модерация Google: Запрос заблокирован! Обнаружен бессмысленный ввод или маты.");
+                    alert("ИИ заблокировал запрос (бред/маты)!");
                     return;
                 }
 
@@ -99,22 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 diaryList.appendChild(listItem);
 
-                totalKcal += calculatedKcal;
-                totalProteins += calculatedProteins;
-                totalFats += calculatedFats;
-                totalCarbs += calculatedCarbs;
-
-                kcalSpan.textContent = totalKcal;
-                proteinsSpan.textContent = totalProteins.toFixed(1);
-                fatsSpan.textContent = totalFats.toFixed(1);
-                carbsSpan.textContent = totalCarbs.toFixed(1);
-
-                aiProductInput.value = "";
-                productWeightInput.value = 100;
+                totalKcal += calculatedKcal; totalProteins += calculatedProteins; totalFats += calculatedFats; totalCarbs += calculatedCarbs;
+                kcalSpan.textContent = totalKcal; proteinsSpan.textContent = totalProteins.toFixed(1); fatsSpan.textContent = totalFats.toFixed(1); carbsSpan.textContent = totalCarbs.toFixed(1);
+                aiProductInput.value = ""; productWeightInput.value = 100;
 
             } catch (error) {
-                console.error("Критическая ошибка:", error);
-                alert("Произошла ошибка при связи с серверами Google Gemini AI.");
+                console.error(error);
+                alert("Ошибка ИИ. Проверьте запрос.");
             } finally {
                 addBtn.disabled = false;
                 addBtn.textContent = "Проанализировать через Gemini";
@@ -130,12 +105,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const weight = parseInt(document.getElementById('user-weight').value);
 
             if (!age || age <= 0 || !height || height <= 0 || !weight || weight <= 0) {
-                alert("Заполните поля корректными числами!");
+                alert("Заполните поля числами!");
                 return;
             }
             let bmr = (10 * weight) + (6.25 * height) - (5 * age);
             bmr += (gender === 'male') ? 5 : -161;
-
             bmrValueSpan.textContent = Math.round(bmr);
             document.querySelector('.norm-result').style.display = 'block';
         });
