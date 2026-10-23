@@ -1,6 +1,5 @@
 "use strict";
 
-// ВАЖНО: Точный путь к твоей бэкенд-функции аналитики на Vercel
 const API_URL = "https://vercel.app";
 
 // Глобальный массив для хранения съеденных продуктов
@@ -36,20 +35,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const catalogSearch = $("catalog-search");
     const catalogList = $("catalog-list");
 
+    // Элементы вкладок переключения режима ввода
+    const tabCatalogBtn = $("tab-catalog-btn");
+    const tabAiBtn = $("tab-ai-btn");
+    const contentCatalog = $("content-catalog");
+    const contentAi = $("content-ai");
+
     if (
         !addBtn || !productInput || !weightInput || !diaryList ||
         !$("total-kcal") || !$("total-proteins") ||
         !$("total-fats") || !$("total-carbs") ||
-        !catalogSearch || !catalogList || !clearDiaryBtn
+        !catalogSearch || !catalogList || !clearDiaryBtn ||
+        !tabCatalogBtn || !tabAiBtn || !contentCatalog || !contentAi
     ) {
         console.error("Не найдены необходимые элементы HTML.");
         return;
     }
 
-    // Инициализация данных из памяти браузера при загрузке
+    // Инициализация сохраненных данных
     loadProfileFromStorage();
     loadDiaryFromStorage();
     renderCatalog();
+
+    // ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК (ИНТЕРФЕЙСУ)
+    tabCatalogBtn.addEventListener("click", () => {
+        tabCatalogBtn.classList.add("active");
+        tabAiBtn.classList.remove("active");
+        contentCatalog.classList.add("active");
+        contentAi.classList.remove("active");
+    });
+
+    tabAiBtn.addEventListener("click", () => {
+        tabAiBtn.classList.add("active");
+        tabCatalogBtn.classList.remove("active");
+        contentAi.classList.add("active");
+        contentCatalog.classList.remove("active");
+    });
 
     // РЕНДЕР КАТАЛОГА ПРОДУКТОВ
     function renderCatalog(filterText = "") {
@@ -85,10 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
             addBtnCatalog.className = "btn-catalog-add";
             addBtnCatalog.textContent = "+ ДОБАВИТЬ";
 
+            // Клик по каталогу считывает текущий объем/вес, введенный пользователем лично
             addBtnCatalog.addEventListener("click", () => {
                 const weight = Number(weightInput.value);
                 if (!Number.isFinite(weight) || weight <= 0 || weight > 100000) {
-                    alert("Введите корректный вес в поле ИИ-Калькулятора перед добавлением.");
+                    alert("Укажите корректный вес или объем продукта перед добавлением.");
                     weightInput.focus();
                     return;
                 }
@@ -104,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCatalog(e.target.value);
     });
 
-    // ОБРАЩЕНИЕ К GEMINI API ЧЕРЕЗ СЕРВЕР VERCEL
+    // ЗАПРОС К GEMINI API
     async function askGemini(product) {
         const response = await fetch(API_URL, {
             method: "POST",
@@ -134,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return data;
     }
 
-    // ДОБАВЛЕНИЕ ЗАПИСИ В ДНЕВНИК И ХРАНИЛИЩЕ
+    // РАСЧЕТ И ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЬСКОГО ОБЪЕМА В ДНЕВНИК
     function addDiaryItem(product, weight, result) {
         const kcal = Math.round(result.kcal * weight / 100);
         const proteins = result.proteins * weight / 100;
@@ -148,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDiaryUI();
     }
 
-    // СИНХРОНИЗАЦИЯ ИНТЕРФЕЙСА ДНЕВНИКА С ОБЩИМ СЧЕТОМ
+    // СИНХРОНИЗАЦИЯ ИНТЕРФЕЙСА ДНЕВНИКА
     function updateDiaryUI() {
         diaryList.innerHTML = "";
 
@@ -164,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const description = document.createElement("div");
 
             const title = document.createElement("strong");
-            title.textContent = `${item.product} — ${item.weight} г`;
+            title.textContent = `${item.product} — ${item.weight} г/мл`;
 
             const details = document.createElement("small");
             details.style.color = "#8d8d99";
@@ -172,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `Б: ${item.proteins.toFixed(1)} г | ` +
                 `Ж: ${item.fats.toFixed(1)} г | ` +
                 `У: ${item.carbs.toFixed(1)} г | ` +
-                `${item.originalKcal} ккал на 100 г`;
+                `${item.originalKcal} ккал на 100 г/мл`;
 
             const calories = document.createElement("span");
             calories.style.fontWeight = "bold";
@@ -206,14 +228,12 @@ document.addEventListener("DOMContentLoaded", () => {
         $("total-carbs").textContent = totalCarbs.toFixed(1);
     }
 
-    // УДАЛЕНИЕ ОТДЕЛЬНОГО ПРОДУКТА
     function removeDiaryItem(index) {
         diaryItems.splice(index, 1);
         localStorage.setItem("diaryItems", JSON.stringify(diaryItems));
         updateDiaryUI();
     }
 
-    // ОЧИСТКА ВСЕГО ДНЕВНИКА ЗА ДЕНЬ
     clearDiaryBtn.addEventListener("click", () => {
         if (diaryItems.length === 0) return;
         if (confirm("Вы уверены, что хотите полностью очистить дневник за сегодня?")) {
@@ -223,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ЗАГРУЗКА ДАННЫХ ИЗ LOCALSTORAGE
     function loadDiaryFromStorage() {
         const saved = localStorage.getItem("diaryItems");
         if (saved) {
@@ -247,86 +266,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             !Number.isFinite(age) || age < 1 || age > 120 ||
-            !Number.isFinite(height) || height < 50 || height > 250 ||
-            !Number.isFinite(weight) || weight < 10 || weight > 300
-        ) {
-            alert("Проверь возраст, рост и вес.");
-            return null;
-        }
-
-        let bmr = 10 * weight + 6.25 * height - 5 * age;
-        bmr += gender === "male" ? 5 : -161;
-        const finalBmr = Math.round(bmr);
-
-        const profile = { gender, age, height, weight, bmr: finalBmr };
-        localStorage.setItem("userProfile", JSON.stringify(profile));
-
-        return finalBmr;
-    }
-    function loadProfileFromStorage() {
-        const saved = localStorage.getItem("userProfile");
-        if (saved) {
-            try {
-                const profile = JSON.parse(saved);
-                const maleRadio = document.querySelector('input[name="gender"][value="male"]');
-                const femaleRadio = document.querySelector('input[name="gender"][value="female"]');
-                
-                if (profile.gender === "male" && maleRadio) maleRadio.checked = true;
-                if (profile.gender === "female" && femaleRadio) femaleRadio.checked = true;
-
-                if ($("user-age")) $("user-age").value = profile.age;
-                if ($("user-height")) $("user-height").value = profile.height;
-                if ($("user-weight")) $("user-weight").value = profile.weight;
-
-                if (bmrValueSpan) bmrValueSpan.textContent = profile.bmr;
-                if (normResult) normResult.style.display = "block";
-            } catch (e) {
-                console.error("Ошибка чтения профиля", e);
-            }
-        }
-    }
-
-    // ДОБАВЛЕНИЕ ЧЕРЕЗ ИИ ПО КЛИКУ
-    addBtn.addEventListener("click", async () => {
-        const product = productInput.value.trim();
-        const weight = Number(weightInput.value);
-
-        if (!product) {
-            alert("Введи название продукта.");
-            productInput.focus();
-            return;
-        }
-
-        if (!Number.isFinite(weight) || weight <= 0 || weight > 100000) {
-            alert("Введи корректный вес или объём.");
-            weightInput.focus();
-            return;
-        }
-
-        addBtn.disabled = true;
-        addBtn.textContent = "Gemini анализирует...";
-
-        try {
-            const result = await askGemini(product);
-            addDiaryItem(product, weight, result);
-
-            productInput.value = "";
-            weightInput.value = "100";
-            productInput.focus();
-        } catch (error) {
-            console.error("Ошибка анализа продукта:", error);
-            alert(error.message || "Не удалось связаться с ИИ. Попробуй ещё раз.");
-        } finally {
-            addBtn.disabled = false;
-            addBtn.textContent = "Проанализировать через Gemini";
-        }
-    });
-
-    calcNormBtn?.addEventListener("click", () => {
-        const bmr = calculateBMR();
-        if (bmr !== null) {
-            if (bmrValueSpan) bmrValueSpan.textContent = bmr;
-            if (normResult) normResult.style.display = "block";
-        }
-    });
-});
