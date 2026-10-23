@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
-const GEMINI_API_URL = "https://googleapis.com" + GEMINI_API_KEY;
+const GEMINI_API_URL = "https://googleapis.com/" + GEMINI_API_KEY;
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
 
