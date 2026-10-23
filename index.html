@@ -20,7 +20,7 @@
         </header>
 
         <div class="main-grid">
-            <!-- Левая колонка: Расчет нормы, Каталог и ИИ-Калькулятор -->
+            <!-- Левая колонка: Расчет нормы и Объединенный калькулятор -->
             <div class="left-column">
                 <!-- Блок расчета суточной нормы -->
                 <section class="profile-box">
@@ -50,32 +50,41 @@
                     </div>
                 </section>
 
-                <!-- Блок быстрого каталога продуктов -->
-                <section class="catalog-box">
-                    <h2>Быстрый каталог продуктов</h2>
-                    <div class="form-group">
-                        <label for="catalog-search">Поиск по каталогу:</label>
-                        <input type="text" id="catalog-search" placeholder="Начните вводить: курица, яйцо...">
-                    </div>
-                    <div class="catalog-wrapper">
-                        <ul id="catalog-list" class="catalog-list">
-                            <!-- Продукты добавляются динамически из JS -->
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- Блок ИИ-Калькулятора -->
+                <!-- ОБЪЕДИНЕННЫЙ БЛОК: Каталог + ИИ Калькулятор -->
                 <section class="calculator-box">
-                    <h2>Посчитать продукт через ИИ</h2>
-                    <div class="form-group">
-                        <label for="ai-product-input">Что ты съел? (Нейросеть поймет любое блюдо):</label>
-                        <input type="text" id="ai-product-input" placeholder="Например: панакота, стейк рибай, фанта">
+                    <!-- Переключатель вкладок -->
+                    <div class="tabs-container">
+                        <button id="tab-catalog-btn" class="tab-btn active">Из каталога</button>
+                        <button id="tab-ai-btn" class="tab-btn">Через ИИ</button>
                     </div>
+
+                    <!-- Общее поле ввода веса/объема -->
                     <div class="form-group">
-                        <label for="product-weight">Вес или Объем (г/мл):</label>
-                        <input type="number" id="product-weight" value="100" min="1">
+                        <label for="product-weight">Укажи вес или объем (г/мл):</label>
+                        <input type="number" id="product-weight" value="100" min="1" max="100000">
                     </div>
-                    <button id="add-btn" class="btn">Проанализировать через Gemini</button>
+
+                    <!-- Контент вкладки КАТАЛОГА -->
+                    <div id="content-catalog" class="tab-content active">
+                        <div class="form-group">
+                            <label for="catalog-search">Быстрый поиск продукта:</label>
+                            <input type="text" id="catalog-search" placeholder="Начни вводить: курица, рис...">
+                        </div>
+                        <div class="catalog-wrapper">
+                            <ul id="catalog-list" class="catalog-list">
+                                <!-- Продукты генерируются через JS -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Контент вкладки ИИ -->
+                    <div id="content-ai" class="tab-content">
+                        <div class="form-group">
+                            <label for="ai-product-input">Что ты съел или выпил? (Нейросеть поймет всё):</label>
+                            <input type="text" id="ai-product-input" placeholder="Например: панакота, стейк рибай, фанта">
+                        </div>
+                        <button id="add-btn" class="btn">Проанализировать через Gemini</button>
+                    </div>
                 </section>
             </div>
 
