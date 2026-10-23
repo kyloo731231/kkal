@@ -77,7 +77,7 @@ body {
 /* ==========================================================================
    4. БЛОКИ-КОНТЕЙНЕРЫ И ЗАГОЛОВКИ
    ========================================================================== */
-.calculator-box, .diary-box, .profile-box, .catalog-box {
+.calculator-box, .diary-box, .profile-box {
     background-color: #1d1d22;
     border: 1px solid #29292e;
     border-radius: 12px;
@@ -93,7 +93,6 @@ h2 {
     color: #00f5d4; /* Мятный неон */
 }
 
-/* Шапка дневника с кнопкой полной очистки дня */
 .diary-header {
     display: flex;
     justify-content: space-between;
@@ -103,6 +102,44 @@ h2 {
 
 .diary-header h2 {
     margin-bottom: 0;
+}
+
+/* СТИЛИ ВКЛАДОК (ИНТЕРФЕЙС ПЕРЕКЛЮЧЕНИЯ КАТАЛОГ/ИИ) */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #29292e;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #121214;
+    border: 1px solid #29292e;
+    border-radius: 6px;
+    color: #8d8d99;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background-color: #29292e;
+    color: #00f5d4;
+    border-color: #00f5d4;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
 }
 
 /* ==========================================================================
@@ -161,7 +198,7 @@ input:focus {
 }
 
 /* ==========================================================================
-   6. КНОПКИ (ГЛАВНЫЕ И СЛУЖЕБНЫЕ)
+   6. КНОПКИ
    ========================================================================== */
 .btn {
     width: 100%;
@@ -289,10 +326,10 @@ input:focus {
 }
 
 /* ==========================================================================
-   8. КАТАЛОГ ПРОДУКТОВ
+   8. КАТАЛОГ ВНУТРИ КАЛЬКУЛЯТОРА
    ========================================================================== */
 .catalog-wrapper {
-    max-height: 200px;
+    max-height: 180px;
     overflow-y: auto;
     border: 1px solid #29292e;
     border-radius: 8px;
@@ -346,7 +383,7 @@ input:focus {
 }
 
 /* ==========================================================================
-   9. АДАПТИВНАЯ ВЕРСТКА (ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ)
+   9. АДАПТИВНАЯ ВЕРСТКА
    ========================================================================== */
 @media (max-width: 768px) {
     body {
