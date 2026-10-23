@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Помощник Калорий с Google Gemini</title>
-    <!-- Подключаем жирный красивый шрифт Unbounded -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- ПОДКЛЮЧАЕМ НАСТОЯЩИЙ ИИ: Стабильный CDN-скрипт Google Generative AI -->
-    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.24.1/dist/index.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="container">
-        <!-- Шапка сайта -->
         <header class="main-header">
             <h1>Калькулятор Ккал</h1>
             <p>Твой интерактивный дневник БЖУ на базе нейросети Google Gemini</p>
@@ -25,13 +18,9 @@
         </header>
 
         <div class="main-grid">
-            <!-- Левая колонка: Расчет нормы и ИИ-Калькулятор -->
             <div class="left-column">
-                
-                <!-- Блок расчета суточной нормы -->
                 <section class="profile-box">
                     <h2>Твоя суточная норма</h2>
-                    
                     <div class="form-row">
                         <div class="form-group">
                             <label>Пол:</label>
@@ -45,7 +34,6 @@
                             <input type="number" id="user-age" value="25" min="1" max="120">
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="user-height">Рост (см):</label>
@@ -56,41 +44,29 @@
                             <input type="number" id="user-weight" value="70" min="10" max="300">
                         </div>
                     </div>
-
                     <button id="calc-norm-btn" class="btn btn-secondary">Рассчитать норму</button>
-
                     <div class="norm-result" style="display: none;">
                         Норма базового обмена: <span id="bmr-value">0</span> ккал
                     </div>
                 </section>
 
-                <!-- Блок ИИ-Калькулятора -->
                 <section class="calculator-box">
                     <h2>Посчитать продукт через ИИ</h2>
-                    
                     <div class="form-group">
                         <label for="ai-product-input">Что ты съел? (Нейросеть поймет любое блюдо):</label>
                         <input type="text" id="ai-product-input" placeholder="Например: панакота, стейк рибай, фанта">
                     </div>
-                    
                     <div class="form-group">
                         <label for="product-weight">Вес или Объем (г/мл):</label>
                         <input type="number" id="product-weight" value="100" min="1">
                     </div>
-
                     <button id="add-btn" class="btn">Проанализировать через Gemini</button>
                 </section>
-
             </div>
 
-            <!-- Правая колонка: Дневник за сегодня -->
             <section class="diary-box">
                 <h2>Дневник питания за сегодня</h2>
-                <ul id="diary-list" class="diary-list">
-                    <!-- Сюда JS добавляет продукты -->
-                </ul>
-
-                <!-- Итоги дня -->
+                <ul id="diary-list" class="diary-list"></ul>
                 <div class="totals">
                     <h3>Итого за день:</h3>
                     <div class="totals-grid">
@@ -103,8 +79,6 @@
             </section>
         </div>
     </div>
-
-    <!-- Подключаем как обычный, стабильный скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
