@@ -6,18 +6,92 @@ const API_URL = "https://vercel.app";
 let diaryItems = [];
 
 // ЛОКАЛЬНАЯ БАЗА ПРОДУКТОВ (КБЖУ указано на 100 г)
+// ОГРОМНАЯ ЛОКАЛЬНАЯ БАЗА ПРОДУКТОВ И НАПИТКОВ (КБЖУ на 100 г / 100 мл)
 const FOOD_DATABASE = [
+    // --- МЯСО, ПТИЦА И ЯЙЦА ---
     { name: "Куриное филе (отварное)", kcal: 170, proteins: 30.0, fats: 5.0, carbs: 0.0 },
-    { name: "Рис белый (отварной)", kcal: 130, proteins: 2.7, fats: 0.3, carbs: 28.0 },
-    { name: "Гречка отварная", kcal: 110, proteins: 4.2, fats: 1.1, carbs: 21.3 },
+    { name: "Куриная грудка (запеченная)", kcal: 150, proteins: 28.0, fats: 4.2, carbs: 0.0 },
+    { name: "Говядина (отварная постная)", kcal: 254, proteins: 25.8, fats: 16.8, carbs: 0.0 },
+    { name: "Свинина (запеченная нежирная)", kcal: 260, proteins: 23.0, fats: 18.0, carbs: 0.0 },
+    { name: "Фарш домашний (говядина + свинина)", kcal: 263, proteins: 17.0, fats: 21.0, carbs: 0.0 },
+    { name: "Индейка (филе отварное)", kcal: 130, proteins: 24.5, fats: 3.5, carbs: 0.0 },
     { name: "Яйцо куриное (1 шт ≈ 50г)", kcal: 155, proteins: 13.0, fats: 11.0, carbs: 1.1 },
+    { name: "Белок куриного яйца", kcal: 44, proteins: 11.1, fats: 0.0, carbs: 1.0 },
+    { name: "Желток куриного яйца", kcal: 352, proteins: 16.2, fats: 31.2, carbs: 1.0 },
+
+    // --- РЫБА И МОРЕПРОДУКТЫ ---
+    { name: "Стейк из лосося / семги", kcal: 201, proteins: 20.0, fats: 13.0, carbs: 0.0 },
+    { name: "Горбуша (запеченная)", kcal: 142, proteins: 21.0, fats: 6.5, carbs: 0.0 },
+    { name: "Треска (на пару)", kcal: 78, proteins: 17.8, fats: 0.7, carbs: 0.0 },
+    { name: "Тунец консервированный (в собств. соку)", kcal: 96, proteins: 21.0, fats: 1.2, carbs: 0.0 },
+    { name: "Креветки (отварные)", kcal: 95, proteins: 19.0, fats: 2.1, carbs: 0.0 },
+    { name: "Кальмары (отварные)", kcal: 122, proteins: 21.2, fats: 2.8, carbs: 2.0 },
+
+    // --- ГАРНИРЫ, КРУПЫ И КАРТОФЕЛЬ (в готовом виде) ---
+    { name: "Рис белый (отварной)", kcal: 130, proteins: 2.7, fats: 0.3, carbs: 28.0 },
+    { name: "Рис бурый / дикий (отварной)", kcal: 110, proteins: 2.6, fats: 0.9, carbs: 23.0 },
+    { name: "Гречка отварная", kcal: 110, proteins: 4.2, fats: 1.1, carbs: 21.3 },
+    { name: "Макароны твердых сортов (отварные)", kcal: 140, proteins: 5.0, fats: 0.5, carbs: 28.0 },
     { name: "Овсяная каша на воде", kcal: 88, proteins: 3.0, fats: 1.7, carbs: 15.0 },
+    { name: "Овсяная каша на молоке 2.5%", kcal: 102, proteins: 3.2, fats: 2.5, carbs: 16.0 },
+    { name: "Булгур отварной", kcal: 83, proteins: 3.0, fats: 0.2, carbs: 14.1 },
+    { name: "Картофельное пюре (на молоке с маслом)", kcal: 106, proteins: 2.0, fats: 4.8, carbs: 14.5 },
+    { name: "Картофель запеченный", kcal: 85, proteins: 2.0, fats: 0.1, carbs: 19.0 },
+
+    // --- МОЛОЧНЫЕ ПРОДУКТЫ И СЫРЫ ---
+    { name: "Творог 0% (обезжиренный)", kcal: 78, proteins: 16.5, fats: 0.2, carbs: 1.8 },
     { name: "Творог 5%", kcal: 121, proteins: 17.2, fats: 5.0, carbs: 2.8 },
+    { name: "Творог 9%", kcal: 159, proteins: 16.0, fats: 9.0, carbs: 3.0 },
+    { name: "Молоко 2.5%", kcal: 54, proteins: 2.9, fats: 2.5, carbs: 4.8 },
+    { name: "Молоко 3.2%", kcal: 60, proteins: 2.9, fats: 3.2, carbs: 4.7 },
+    { name: "Кефир 1%", kcal: 40, proteins: 2.8, fats: 1.0, carbs: 4.0 },
+    { name: "Йогурт натуральный 2% (без сахара)", kcal: 60, proteins: 5.0, fats: 2.0, carbs: 3.5 },
+    { name: "Сыр Российский / Голландский 45%", kcal: 350, proteins: 25.0, fats: 26.0, carbs: 0.0 },
+    { name: "Сыр Моцарелла", kcal: 240, proteins: 18.0, fats: 18.0, carbs: 1.0 },
+
+    // --- ОВОЩИ И ЗЕЛЕНЬ ---
+    { name: "Огурцы свежие", kcal: 15, proteins: 0.8, fats: 0.1, carbs: 2.8 },
+    { name: "Помидоры свежие", kcal: 20, proteins: 0.6, fats: 0.2, carbs: 4.2 },
+    { name: "Капуста белокочанная", kcal: 27, proteins: 1.8, fats: 0.1, carbs: 4.7 },
+    { name: "Салат айсберг / листья салата", kcal: 14, proteins: 0.9, fats: 0.1, carbs: 1.8 },
+    { name: "Перец болгарский", kcal: 27, proteins: 1.3, fats: 0.1, carbs: 5.3 },
+    { name: "Брокколи (на пару)", kcal: 35, proteins: 2.8, fats: 0.4, carbs: 4.0 },
+
+    // --- ФРУКТЫ И ЯГОДЫ ---
     { name: "Банан", kcal: 89, proteins: 1.5, fats: 0.2, carbs: 21.8 },
     { name: "Яблоко", kcal: 52, proteins: 0.3, fats: 0.2, carbs: 13.8 },
-    { name: "Стейк из лосося", kcal: 201, proteins: 20.0, fats: 13.0, carbs: 0.0 },
-    { name: "Арахисовая паста", kcal: 588, proteins: 25.0, fats: 50.0, carbs: 20.0 }
+    { name: "Апельсин", kcal: 43, proteins: 0.9, fats: 0.2, carbs: 8.1 },
+    { name: "Грейпфрут", kcal: 35, proteins: 0.7, fats: 0.2, carbs: 6.5 },
+    { name: "Клубника", kcal: 33, proteins: 0.8, fats: 0.4, carbs: 7.5 },
+    { name: "Авокадо", kcal: 160, proteins: 2.0, fats: 14.7, carbs: 6.7 },
+
+    // --- ОРЕХИ И МАСЛА ---
+    { name: "Арахисовая паста", kcal: 588, proteins: 25.0, fats: 50.0, carbs: 20.0 },
+    { name: "Орехи грецкие", kcal: 654, proteins: 15.2, fats: 65.2, carbs: 7.0 },
+    { name: "Миндаль", kcal: 645, proteins: 18.6, fats: 57.7, carbs: 13.6 },
+    { name: "Масло оливковое / подсолнечное", kcal: 899, proteins: 0.0, fats: 99.9, carbs: 0.0 },
+    { name: "Масло сливочное 82.5%", kcal: 748, proteins: 0.5, fats: 82.5, carbs: 0.8 },
+
+    // --- ХЛЕБ И ВЫПЕЧКА ---
+    { name: "Хлеб белый пшеничный", kcal: 242, proteins: 8.1, fats: 1.0, carbs: 48.8 },
+    { name: "Хлеб ржаной / бородинский", kcal: 210, proteins: 6.8, fats: 1.3, carbs: 40.0 },
+    { name: "Хлебцы цельнозерновые (1 шт ≈ 10г)", kcal: 300, proteins: 11.0, fats: 2.5, carbs: 58.0 },
+
+    // --- ФАСТФУД И СЛАДОСТИ ---
+    { name: "Бургер классический (средний)", kcal: 250, proteins: 13.0, fats: 10.0, carbs: 27.0 },
+    { name: "Картофель фри", kcal: 312, proteins: 3.4, fats: 15.0, carbs: 38.0 },
+    { name: "Пицца Пепперони", kcal: 274, proteins: 11.5, fats: 12.1, carbs: 29.7 },
+    { name: "Шоколад молочный", kcal: 550, proteins: 6.9, fats: 34.0, carbs: 54.0 },
+    { name: "Шоколад горький 70%", kcal: 539, proteins: 6.2, fats: 35.4, carbs: 48.2 },
+
+    // --- НАПИТКИ ---
+    { name: "Кока-Кола (классическая)", kcal: 42, proteins: 0.0, fats: 0.0, carbs: 10.6 },
+    { name: "Кола Зеро / Без сахара", kcal: 0, proteins: 0.0, fats: 0.0, carbs: 0.0 },
+    { name: "Сок апельсиновый (пакетированный)", kcal: 45, proteins: 0.7, fats: 0.2, carbs: 10.2 },
+    { name: "Кофе капучино (без сахара)", kcal: 35, proteins: 1.8, fats: 1.5, carbs: 2.8 },
+    { name: "Пиво светлое 4.5%", kcal: 43, proteins: 0.5, fats: 0.0, carbs: 3.8 }
 ];
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const $ = id => document.getElementById(id);
