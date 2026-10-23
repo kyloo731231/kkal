@@ -1,84 +1,41 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Помощник Калорий с Google Gemini</title>
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <header class="main-header">
-            <h1>Калькулятор Ккал</h1>
-            <p>Твой интерактивный дневник БЖУ на базе нейросети Google Gemini</p>
-            <div id="ai-status" class="ai-status-badge">Интеграция: Cloud Gemini AI Active</div>
-        </header>
+<!-- Полностью переделанный блок суточной нормы (Построчная структура) -->
+<section class="profile-box">
+    <h2>Твоя суточная норма</h2>
+    
+    <!-- Строка 1: Метка пола -->
+    <div class="form-group">
+        <label>Пол пользователя:</label>
+    </div>
 
-        <div class="main-grid">
-            <div class="left-column">
-                <section class="profile-box">
-                    <h2>Твоя суточная норма</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Пол:</label>
-                            <div class="gender-switch">
-                                <label><input type="radio" name="gender" value="male" checked> Мужской</label>
-                                <label><input type="radio" name="gender" value="female"> Женский</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="user-age">Возраст (лет):</label>
-                            <input type="number" id="user-age" value="25" min="1" max="120">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="user-height">Рост (см):</label>
-                            <input type="number" id="user-height" value="175" min="50" max="250">
-                        </div>
-                        <div class="form-group">
-                            <label for="user-weight">Вес (кг):</label>
-                            <input type="number" id="user-weight" value="70" min="10" max="300">
-                        </div>
-                    </div>
-                    <button id="calc-norm-btn" class="btn btn-secondary">Рассчитать норму</button>
-                    <div class="norm-result" style="display: none;">
-                        Норма базового обмена: <span id="bmr-value">0</span> ккал
-                    </div>
-                </section>
-
-                <section class="calculator-box">
-                    <h2>Посчитать продукт через ИИ</h2>
-                    <div class="form-group">
-                        <label for="ai-product-input">Что ты съел? (Нейросеть поймет любое блюдо):</label>
-                        <input type="text" id="ai-product-input" placeholder="Например: панакота, стейк рибай, фанта">
-                    </div>
-                    <div class="form-group">
-                        <label for="product-weight">Вес или Объем (г/мл):</label>
-                        <input type="number" id="product-weight" value="100" min="1">
-                    </div>
-                    <button id="add-btn" class="btn">Проанализировать через Gemini</button>
-                </section>
-            </div>
-
-            <section class="diary-box">
-                <h2>Дневник питания за сегодня</h2>
-                <ul id="diary-list" class="diary-list"></ul>
-                <div class="totals">
-                    <h3>Итого за день:</h3>
-                    <div class="totals-grid">
-                        <div class="total-item">Ккал: <span id="total-kcal">0</span></div>
-                        <div class="total-item">Белки: <span id="total-proteins">0</span>г</div>
-                        <div class="total-item">Жиры: <span id="total-fats">0</span>г</div>
-                        <div class="total-item">Угл: <span id="total-carbs">0</span>г</div>
-                    </div>
-                </div>
-            </section>
+    <!-- Строка 2: Переключатели пола (радиокнопки) -->
+    <div class="form-group">
+        <div class="gender-switch">
+            <label><input type="radio" name="gender" value="male" checked> Мужской пол</label>
+            <label><input type="radio" name="gender" value="female"> Женский пол</label>
         </div>
     </div>
-    <script src="script.js"></script>
-</body>
-</html>
+
+    <!-- Строка 3: Возраст -->
+    <div class="form-group">
+        <label for="user-age">Возраст (полных лет):</label>
+        <input type="number" id="user-age" value="22" min="1" max="120">
+    </div>
+
+    <!-- Строка 4: Рост -->
+    <div class="form-group">
+        <label for="user-height">Рост (в сантиметрах):</label>
+        <input type="number" id="user-height" value="183" min="50" max="250">
+    </div>
+
+    <!-- Строка 5: Вес -->
+    <div class="form-group">
+        <label for="user-weight">Вес (в килограммах):</label>
+        <input type="number" id="user-weight" value="106" min="10" max="300">
+    </div>
+
+    <button id="calc-norm-btn" class="btn btn-secondary">Рассчитать суточную норму</button>
+
+    <div class="norm-result" style="display: none;">
+        Норма базового обмена: <span id="bmr-value">0</span> ккал
+    </div>
+</section>
