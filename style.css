@@ -69,7 +69,7 @@ body {
 }
 
 /* 4. БЛОКИ-КОНТЕЙНЕРЫ */
-.calculator-box, .diary-box, .profile-box {
+.calculator-box, .diary-box, .profile-box, .catalog-box {
     background-color: #1d1d22;
     border: 1px solid #29292e;
     border-radius: 12px;
@@ -85,16 +85,21 @@ h2 {
     color: #00f5d4; /* Мятный неон */
 }
 
-/* 5. ЭЛЕМЕНТЫ ФОРМЫ (ИСПРАВЛЕНИЕ НАЛОЖЕНИЯ) */
-.form-group {
-    margin-bottom: 20px;
-    width: 100%;
+/* Шапка дневника с кнопкой очистки */
+.diary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
 }
 
-/* Строка из нескольких полей (для ПК отображается в ряд) */
-.form-row {
-    display: flex;
-    gap: 20px;
+.diary-header h2 {
+    margin-bottom: 0;
+}
+
+/* 5. ЭЛЕМЕНТЫ ФОРМЫ */
+.form-group {
+    margin-bottom: 20px;
     width: 100%;
 }
 
@@ -121,10 +126,9 @@ input:focus {
     border-color: #ff2a7a;
 }
 
-/* ИСПРАВЛЕННЫЙ ПЕРЕКЛЮЧАТЕЛЬ ПОЛА (Больше не ломается на смартфонах) */
 .gender-switch {
     display: flex;
-    flex-direction: column; /* Элементы внутри блока теперь выстроены друг под другом */
+    flex-direction: column;
     gap: 12px;
     padding-top: 4px;
 }
@@ -135,7 +139,7 @@ input:focus {
     gap: 8px;
     cursor: pointer;
     color: #fff;
-    margin-bottom: 0; /* Убираем конфликтные отступы */
+    margin-bottom: 0;
     font-size: 15px;
 }
 
@@ -143,7 +147,7 @@ input:focus {
     width: 20px;
     height: 20px;
     cursor: pointer;
-    accent-color: #ff2a7a; /* Перекрашиваем точку радио-кнопки в неоновый розовый */
+    accent-color: #ff2a7a;
 }
 
 /* 6. КНОПКИ */
@@ -181,6 +185,25 @@ input:focus {
     background-color: #00d4b8;
 }
 
+.btn-clear {
+    background: none;
+    border: 1px solid #ff2a7a;
+    color: #ff2a7a;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background-color: #ff2a7a;
+    color: #fff;
+}
+
 /* 7. ИТОГИ И ДНЕВНИК */
 .norm-result {
     margin-top: 20px;
@@ -202,7 +225,7 @@ input:focus {
 .diary-list {
     list-style: none;
     margin-bottom: 25px;
-    max-height: 250px;
+    max-height: 350px;
     overflow-y: auto;
 }
 
@@ -251,32 +274,78 @@ input:focus {
     margin-top: 6px;
 }
 
-/* ==========================================================================
-   8. АДАПТИВНАЯ ВЕРСТКА: МЕДИА-ЗАПРОСЫ (ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ)
-   ========================================================================== */
+/* 8. КАТАЛОГ ПРОДУКТОВ */
+.catalog-wrapper {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #29292e;
+    border-radius: 8px;
+    background-color: #121214;
+    padding: 8px;
+}
+
+.catalog-list {
+    list-style: none;
+}
+
+.catalog-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-bottom: 1px solid #29292e;
+    font-size: 14px;
+}
+
+.catalog-item:last-child {
+    border-bottom: none;
+}
+
+.catalog-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.catalog-info .kbju {
+    font-size: 11px;
+    color: #8d8d99;
+}
+
+.btn-catalog-add {
+    background-color: #00f5d4;
+    color: #121214;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-catalog-add:hover {
+    background-color: #00d4b8;
+}
+
+/* 9. АДАПТИВНАЯ ВЕРСТКА */
 @media (max-width: 768px) {
     body {
-        padding: 20px 12px; /* Меньше отступы от краев экрана смартфона */
+        padding: 20px 12px;
     }
 
     .main-header h1 {
-        font-size: 24px; /* Уменьшаем заголовок, чтобы он не переносился криво */
+        font-size: 24px;
     }
 
-    /* Превращаем двухколоночную сетку ПК в одну вертикальную колонку */
     .main-grid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
         gap: 20px;
     }
 
-    /* Все горизонтальные строки полей (Рост/Вес) перестраиваем в вертикальный стек */
-    .form-row {
-        flex-direction: column;
-        gap: 0; /* Убираем боковой зазор за ненадобностью */
-    }
-
     .totals-grid {
-        grid-template-columns: repeat(2, 1fr); /* Итоги БЖУ на мобилке встанут компактно 2х2 */
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
 }
