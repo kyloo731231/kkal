@@ -1,8 +1,16 @@
 
+/*
+ * Калькулятор калорий с Google Gemini
+ * Функции: анализ еды, подсчёт КБЖУ, дневник, расчёт BMR.
+ *
+ * ВАЖНО: прямое использование API-ключа в браузере небезопасно.
+ * Для публичного сайта используй серверный прокси.
+ */
+
 const GEMINI_API_KEY = "AQ.Ab8RN6LnsX9pBftDrnblJAPj6df8OeKhGviflV5xnbo9-lMklg";
-const GEMINI_MODEL = "gemini-2.5-flash";
-const GEMINI_API_URL =
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+const GEMINI_BASE_URL =
+    "https://generativelanguage.googleapis.com/v1beta";
 
 let totalKcal = 0;
 let totalProteins = 0;
@@ -25,90 +33,181 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcNormBtn = $("calc-norm-btn");
     const bmrValueSpan = $("bmr-value");
 
+    let selectedModel = null;
+
+    async function getAvailableModel() {
+        if (selectedModel) return selectedModel;
+
+        const response = await fetch(
+            `${GEMINI_BASE_URL}/models?key=${encodeURIComponent(GEMINI_API_KEY)}`
+        );
+
+        if (!response.ok) {
+            const details = await response.text();
+            console.error("Ошибка списка моделей:", response.status, details);
+
+            throw new Error(
+                `Не удалось получить модели Gemini (HTTP ${response.status}). ` +
+                "Проверь API-ключ и доступ к Gemini API."
+            );
+        }
+
+        const data = await response.json();
+        const models = data.models || [];
+
+        const preferred = [
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-2.0-flash"
+        ];
+
+        for (const name of preferred) {
+            const model = models.find(m =>
+                m.name?.endsWith(`/models/${name}`) &&
+                (m.supportedGenerationMethods || [])
+                    .includes("generateContent")
+            );
+
+            if (model) {
+                selectedModel = model.name;
+                console.log("Выбрана модель:", selectedModel);
+                return selectedModel;
+            }
+        }
+
+        const fallback = models.find(m =>
+            m.name?.startsWith("models/") &&
+            (m.supportedGenerationMethods || [])
+                .includes("generateContent") &&
+            /flash/i.test(m.name)
+        );
+
+        if (!fallback) {
+            throw new Error(
+                "Не найдена доступная Flash-модель с generateContent. " +
+                "Проверь доступные модели в Google AI Studio."
+            );
+        }
+
+        selectedModel = fallback.name;
+        console.log("Выбрана модель:", selectedModel);
+        return selectedModel;
+    }
+
     async function askGemini(product) {
         if (
             !GEMINI_API_KEY ||
             GEMINI_API_KEY === "ВСТАВЬ_НОВЫЙ_API_KEY"
         ) {
-            throw new Error("Сначала настрой API-ключ Gemini.");
+            throw new Error("Добавь действительный API-ключ Gemini.");
         }
 
+        const model = await getAvailableModel();
+
         const prompt = `
-Ты помощник по подсчёту калорий.
-Определи пищевую ценность указанного продукта на 100 г.
-Для напитков используй значения на 100 мл.
+Ты помощник по подсчёту пищевой ценности.
+
+Определи калорийность, белки, жиры и углеводы продукта
+на 100 граммов. Для напитков используй значения на 100 мл.
 Учитывай способ приготовления, если он указан.
-Если запрос не связан с едой или напитками, верни:
+
+Если это не еда и не напиток, верни:
 {"error":"NOT_FOOD"}
 
-Верни только JSON без Markdown:
+Верни только JSON следующей структуры:
 {"kcal":число,"proteins":число,"fats":число,"carbs":число}
 
 Все значения должны быть неотрицательными числами.
+Не добавляй пояснения или Markdown.
+
 Продукт: ${product}
         `.trim();
 
-        const response = await fetch(GEMINI_API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": GEMINI_API_KEY
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }],
-                generationConfig: {
-                    temperature: 0.1,
-                    responseMimeType: "application/json"
-                }
-            })
-        });
+        const response = await fetch(
+            `${GEMINI_BASE_URL}/${model}:generateContent?key=` +
+            encodeURIComponent(GEMINI_API_KEY),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        responseMimeType: "application/json"
+                    }
+                })
+            }
+        );
 
         if (!response.ok) {
             const details = await response.text();
-            console.error("Gemini API:", response.status, details);
+            console.error(
+                "Gemini API:",
+                response.status,
+                details
+            );
 
             if (response.status === 400) {
                 throw new Error(
-                    "Некорректный запрос. Проверь модель и настройки API."
-                );
-            }
-            if (response.status === 401 || response.status === 403) {
-                throw new Error(
-                    "Ошибка доступа. Проверь API-ключ и доступ к Gemini API."
-                );
-            }
-            if (response.status === 429) {
-                throw new Error(
-                    "Превышен лимит запросов Gemini. Попробуй позже."
+                    "Gemini отклонил запрос. Проверь параметры API."
                 );
             }
 
-            throw new Error(`Ошибка Gemini API: ${response.status}`);
+            if (response.status === 401 || response.status === 403) {
+                throw new Error(
+                    "Нет доступа к Gemini. Проверь ключ и разрешения API."
+                );
+            }
+
+            if (response.status === 404) {
+                selectedModel = null;
+                throw new Error(
+                    "Модель не найдена (404). Обнови список моделей и проверь доступ."
+                );
+            }
+
+            if (response.status === 429) {
+                throw new Error(
+                    "Лимит запросов или квота исчерпаны. Попробуй позже."
+                );
+            }
+
+            throw new Error(`Ошибка Gemini API: HTTP ${response.status}`);
         }
 
         const data = await response.json();
+
         const answer = data.candidates?.[0]?.content?.parts
             ?.map(part => part.text || "")
             .join("")
             .trim();
 
         if (!answer) {
+            console.error("Ответ Gemini:", data);
             throw new Error(
-                "Gemini не вернул ответ. Возможно, запрос был заблокирован."
+                "Gemini не вернул текст. Запрос мог быть заблокирован."
             );
         }
 
-        const result = JSON.parse(
-            answer.replace(/^```json\s*/i, "")
-                  .replace(/\s*```$/, "")
-                  .trim()
-        );
+        let result;
 
-        if (result.error === "NOT_FOOD") {
-            return null;
+        try {
+            result = JSON.parse(
+                answer
+                    .replace(/^```json\s*/i, "")
+                    .replace(/\s*```$/, "")
+                    .trim()
+            );
+        } catch {
+            console.error("Некорректный JSON:", answer);
+            throw new Error("Gemini вернул некорректный JSON.");
         }
+
+        if (result.error === "NOT_FOOD") return null;
 
         for (const field of ["kcal", "proteins", "fats", "carbs"]) {
             if (
@@ -116,7 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 !Number.isFinite(result[field]) ||
                 result[field] < 0
             ) {
-                throw new Error("Gemini вернул некорректные данные.");
+                throw new Error(
+                    "Gemini вернул некорректные значения КБЖУ."
+                );
             }
         }
 
@@ -127,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
             result.carbs > 100
         ) {
             throw new Error(
-                "Получены подозрительные значения на 100 г продукта."
+                "Значения на 100 г выглядят недостоверно. Уточни продукт."
             );
         }
 
@@ -138,9 +239,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const product = productInput.value.trim();
         const weight = Number(weightInput.value);
 
-        if (!product || !Number.isFinite(weight) ||
-            weight <= 0 || weight > 100000) {
-            alert("Укажи название продукта и корректный вес.");
+        if (
+            !product ||
+            !Number.isFinite(weight) ||
+            weight <= 0 ||
+            weight > 100000
+        ) {
+            alert("Укажи продукт и корректный вес.");
             return;
         }
 
@@ -151,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await askGemini(product);
 
             if (!result) {
-                alert("Укажи конкретный продукт или напиток.");
+                alert("Не удалось распознать еду. Укажи конкретный продукт.");
                 return;
             }
 
@@ -179,7 +284,12 @@ document.addEventListener("DOMContentLoaded", () => {
             calories.style.color = "#00f5d4";
             calories.textContent = `+${kcal} ккал`;
 
-            description.append(title, document.createElement("br"), details);
+            description.append(
+                title,
+                document.createElement("br"),
+                details
+            );
+
             item.append(description, calories);
             diaryList.appendChild(item);
 
@@ -198,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error(error);
-            alert(error.message || "Ошибка при обращении к Gemini.");
+            alert(error.message || "Не удалось обратиться к Gemini.");
         } finally {
             addBtn.disabled = false;
             addBtn.textContent = "Проанализировать через Gemini";
@@ -208,6 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     calcNormBtn?.addEventListener("click", () => {
         const gender =
             document.querySelector('input[name="gender"]:checked')?.value;
+
         const age = Number($("user-age").value);
         const height = Number($("user-height").value);
         const weight = Number($("user-weight").value);
