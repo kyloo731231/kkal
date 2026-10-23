@@ -1,12 +1,12 @@
 // Токен интеграции ИИ
 const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
+// Официальный эндпоинт Google Gemini 2.5 Flash
+const GEMINI_API_URL = `https://googleapis.com{GEMINI_API_KEY}`;
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
 
-// Запуск логики строго после загрузки страницы браузером
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Инициализация элементов DOM
     const addBtn = document.getElementById('add-btn');
     const productWeightInput = document.getElementById('product-weight');
     const aiProductInput = document.getElementById('ai-product-input');
@@ -20,28 +20,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcNormBtn = document.getElementById('calc-norm-btn');
     const bmrValueSpan = document.getElementById('bmr-value');
 
-    // Функция обращения к Google Gemini с обходом блокировки CORS
+    // Функция обращения к Google Gemini через чистый HTTP fetch
     async function askGoogleGemini(userInput) {
         const systemPrompt = `Ты — профессиональный ИИ-нутрициолог. Твоя задача — строго анализировать входящий текст.
         ПРАВИЛО МОДЕРАЦИИ: Если во входящем тексте написан бред (например, "аыаыаы"), случайный набор букв, нецензурная лексика или абсолютно несъедобные вещи, верни строго слово ERROR без каких-либо кавычек, скобок или знаков.
         ПРАВИЛО РАСЧЕТА: Если текст является реальной едой или напитком, определи её среднюю Ккал, Белки, Жиры, Углеводы строго на 100 грамм (или 100 мл) продукта. 
         Ответ выдай ИСКЛЮЧИТЕЛЬНО в формате чистого JSON-объекта, без markdown разметки и без обратных кавычек: {"kcal":число, "proteins":число, "fats":число, "carbs":число}`;
 
-        // ИСПРАВЛЕНИЕ: Используем официальный статический фабричный метод создания ИИ-клиента
-        const ai = window.GoogleGenAI.GoogleGenAI.create({ 
-            apiKey: GEMINI_API_KEY,
-            requestOptions: {
-                customHeaders: { "X-Requested-With": "XMLHttpRequest" }
-            }
+        // Делаем прямой POST-запрос к API Google
+        const response = await fetch(GEMINI_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: `${systemPrompt}\n\nАнализируй запрос: ${userInput}` }]
+                }]
+            })
         });
 
-        // Делаем вызов модели через защищенный сетевой RPC-протокол Google
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [systemPrompt, `Анализируй запрос: ${userInput}`]
-        });
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
 
-        const aiResponseText = response.text.trim();
+        const data = await response.json();
+        
+        // Извлекаем текст ответа из структуры данных Google API
+        const aiResponseText = data.candidates[0].content.parts[0].text.trim();
         console.log("Ответ от Gemini:", aiResponseText);
 
         if (aiResponseText.includes("ERROR") || aiResponseText === "ERROR") {
@@ -52,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return JSON.parse(cleanJsonString);
     }
 
-    // Привязка обработчика клика к кнопке ИИ
     if (addBtn) {
         addBtn.addEventListener('click', async () => {
             const aiInputText = aiProductInput.value.trim();
@@ -111,14 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Критическая ошибка:", error);
                 alert("Произошла ошибка при связи с серверами Google Gemini AI.");
-            } finally {
+            } finaly {
                 addBtn.disabled = false;
                 addBtn.textContent = "Проанализировать через Gemini";
             }
         });
     }
 
-    // Обработчик расчета нормы
     if (calcNormBtn) {
         calcNormBtn.addEventListener('click', () => {
             const gender = document.querySelector('input[name="gender"]:checked').value;
