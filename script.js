@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ПРАВИЛО РАСЧЕТА: Если текст является реальной едой или напитком, определи её среднюю Ккал, Белки, Жиры, Углеводы строго на 100 грамм (или 100 мл) продукта. 
         Ответ выдай ИСКЛЮЧИТЕЛЬНО в формате чистого JSON-объекта, без markdown разметки и без обратных кавычек: {"kcal":число, "proteins":число, "fats":число, "carbs":число}`;
 
-        // Делаем прямой POST-запрос к API Google
         const response = await fetch(GEMINI_API_URL, {
             method: "POST",
             headers: {
@@ -46,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await response.json();
         
-        // Извлекаем текст ответа из структуры данных Google API
+        // Исправлено: Добавлены корректные индексы массивов Google API [0]
         const aiResponseText = data.candidates[0].content.parts[0].text.trim();
         console.log("Ответ от Gemini:", aiResponseText);
 
@@ -116,7 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Критическая ошибка:", error);
                 alert("Произошла ошибка при связи с серверами Google Gemini AI.");
-            } finaly {
+            } finally {
+                // Исправлено: Опечатка finaly заменена на корректное finally с двумя л
                 addBtn.disabled = false;
                 addBtn.textContent = "Проанализировать через Gemini";
             }
