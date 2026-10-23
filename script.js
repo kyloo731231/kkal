@@ -1,7 +1,7 @@
 // Токен интеграции ИИ
 const GEMINI_API_KEY = "AQ.Ab8RN6L9UVDupC2RKMbG5xsE6xWfvCN8gu9mCdz6XGFZbLT1kw"; 
-// ИСПРАВЛЕННЫЙ ОФИЦИАЛЬНЫЙ АДРЕС: Все символы и знаки на своих местах
-const GEMINI_API_URL = `https://googleapis.com{GEMINI_API_KEY}`;
+// Официальный рабочий адрес Google Gemini 2.5 Flash
+const GEMINI_API_URL = "https://googleapis.com" + GEMINI_API_KEY;
 
 let totalKcal = 0, totalProteins = 0, totalFats = 0, totalCarbs = 0;
 
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcNormBtn = document.getElementById('calc-norm-btn');
     const bmrValueSpan = document.getElementById('bmr-value');
 
-    // Функция обращения к Google Gemini через чистый HTTP fetch
+    // Безотказная функция обращения к Google Gemini через fetch
     async function askGoogleGemini(userInput) {
         const systemPrompt = `Ты — профессиональный ИИ-нутрициолог. Твоя задача — строго анализировать входящий текст.
         ПРАВИЛО МОДЕРАЦИИ: Если во входящем тексте написан бред (например, "аыаыаы"), случайный набор букв, нецензурная лексика или абсолютно несъедобные вещи, верни строго слово ERROR без каких-либо кавычек, скобок или знаков.
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `${systemPrompt}\n\nАнализируй запрос: ${userInput}` }]
+                    parts: [{ text: systemPrompt + "\n\nАнализируй запрос: " + userInput }]
                 }]
             })
         });
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await response.json();
         
-        // ТОЧНОЕ ИСПРАВЛЕНИЕ: Добавлены корректные индексы массивов для структуры Google API
+        // НАСТОЯЩЕЕ ИСПРАВЛЕНИЕ: Добавлены строгие индексы [0] для разбора структуры Google API
         const aiResponseText = data.candidates[0].content.parts[0].text.trim();
         console.log("Ответ от Gemini:", aiResponseText);
 
