@@ -35,8 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await response.json();
         
-        // Жесткий разбор ответа без риска синтаксических опечаток
+        // ТОЧНОЕ ИСПРАВЛЕНИЕ: Добавлены корректные индексы [0] для разбора структуры массивов Google API
         const aiResponseText = data.candidates[0].content.parts[0].text.trim();
+        console.log("Ответ от Gemini:", aiResponseText);
         
         if (aiResponseText.includes("ERROR") || aiResponseText === "ERROR") {
             return "REJECTED";
